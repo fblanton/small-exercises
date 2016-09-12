@@ -10,14 +10,14 @@ function Car(location, direction, speed) {
     switch (this.direction) {
       case 'n':
         this.location[y] -= speed;
-        if (this.location[y] < -bounds[y]) {
+        if (this.location[y] < 0) {
           this.turn('s');
         }
         break;
       case 'ne':
         this.location[x] += speed * .707;
         this.location[y] -= speed * .707;
-        if (this.location[y] < -bounds[y]) {
+        if (this.location[y] < 0) {
           this.turn('se');
         }
         if (this.location[x] > bounds[x]) {
@@ -26,13 +26,19 @@ function Car(location, direction, speed) {
         break;
       case 'e':
         this.location[x] += speed;
-        if (this.location[x] > bounds[x]) {
+        if (this.location[x] > 0) {
           this.turn('w');
         }
         break;
       case 'se':
         this.location[x] += speed * .707;
         this.location[y] += speed * .707;
+        if (this.location[y] > bounds[y]) {
+          this.turn('ne');
+        }
+        if (this.location[x] > bounds[x]) {
+          this.turn('sw');
+        }
         break;
       case 's':
         this.location[y] += speed;
@@ -43,16 +49,28 @@ function Car(location, direction, speed) {
       case 'sw':
         this.location[x] -= speed * .707;
         this.location[y] += speed * .707;
+        if (this.location[y] > bounds[y]) {
+          this.turn('nw');
+        }
+        if (this.location[x] < 0) {
+          this.turn('se');
+        }
         break;
       case 'w':
         this.location[x] -= speed;
-        if (this.location[x] < -bounds[x]) {
+        if (this.location[x] < 0) {
           this.turn('e');
         }
         break;
       case 'nw':
         this.location[x] -= speed * .707;
         this.location[y] -= speed * .707;
+        if (this.location[y] < 0) {
+          this.turn('sw');
+        }
+        if (this.location[x] < 0) {
+          this.turn('ne');
+        }
         break;
     }
   }
@@ -63,8 +81,8 @@ function Car(location, direction, speed) {
 }
 
 var cars = [
-  new Car([0,0], 'e', 3),
-  new Car([-100,10], 'ne', 3)
+  new Car([0,0], 'n', 1),
+  new Car([100,10], 'ne', 2)
 ];
 
 function Map(element, width, height, items) {
@@ -75,23 +93,15 @@ function Map(element, width, height, items) {
   this.items = items;
   this.context = element.getContext('2d');
 
-  this.centerOrigin = function() {
-    var moveX = this.element.width/2;
-    var moveY = this.element.height/2;
-    this.context.translate(moveX, moveY);
-  }
-
   this.show = function(item) {
     this.context.fillStyle = 'red';
     this.context.fillRect(Math.floor(item.location[x]), Math.floor(item.location[y]), 10, 10);
   }
 
   this.update = function() {
-    console.log(this);
-    this.context.clearRect(this.width/-2, this.height/-2, this.width, this.height);
-    //this.items.forEach(item => { item.go(); this.show(item) });
+    this.context.clearRect(0, 0, this.width, this.height);
     for (var i = 0; i < this.items.length; i++) {
-      this.items[i].go([this.width/2,this.width/2]);
+      this.items[i].go([this.width,this.height]);
       this.show(items[i]);
     }
   }
@@ -99,10 +109,13 @@ function Map(element, width, height, items) {
   this.initialize = function() {
     this.element.setAttribute('width', this.width);
     this.element.setAttribute('height', this.height);
-    this.centerOrigin();
   }
+}
+
+function update() {
+  theMap.update();
 }
 
 var theMap = new Map(document.getElementById('map'), 700, 700, cars);
 theMap.initialize();
-setInterval(theMap.update, 5000); //run this command multiple times from console to see cars move
+setInterval(update, 33); //run this command multiple times from console to see cars move
