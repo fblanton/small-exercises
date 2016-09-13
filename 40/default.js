@@ -1,8 +1,11 @@
 var x = 0,
-    y = 1;
+    y = 1,
+    w = 0,
+    h = 1;
 
-function Car(location, direction, speed) {
+function Car(location, size, direction, speed) {
   this.location = location;
+  this.size = size;
   this.direction = direction;
   this.speed = speed;
 
@@ -26,7 +29,7 @@ function Car(location, direction, speed) {
         break;
       case 'e':
         this.location[x] += speed;
-        if (this.location[x] > 0) {
+        if (this.location[x] < 0) {
           this.turn('w');
         }
         break;
@@ -58,7 +61,7 @@ function Car(location, direction, speed) {
         break;
       case 'w':
         this.location[x] -= speed;
-        if (this.location[x] < 0) {
+        if (this.location[x] > bounds[x]) {
           this.turn('e');
         }
         break;
@@ -80,9 +83,14 @@ function Car(location, direction, speed) {
   }
 }
 
+// function Person(location, direction, speed) {
+//
+// }
 var cars = [
-  new Car([0,0], 'n', 1),
-  new Car([100,10], 'ne', 2)
+  new Car([0,0], [10,30], 'se', 4),
+  new Car([100,10], [10,20], 'ne', 5),
+  new Car([341,231], [10,30], 'w', 4),
+  new Car([100,10], [10,20], 's', 5)
 ];
 
 function Map(element, width, height, items) {
@@ -95,7 +103,7 @@ function Map(element, width, height, items) {
 
   this.show = function(item) {
     this.context.fillStyle = 'red';
-    this.context.fillRect(Math.floor(item.location[x]), Math.floor(item.location[y]), 10, 10);
+    this.context.fillRect(Math.floor(item.location[x]), Math.floor(item.location[y]), item.size[w], item.size[h]);
   }
 
   this.update = function() {
