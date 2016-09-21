@@ -19,8 +19,10 @@ const TodoInput = React.createClass({
     return React.createElement('form', {
       onSubmit: (e) => {
         e.preventDefault();
-        store.dispatch({type: 'ADD_TODO', text: this.props.value});
-        store.dispatch({type: 'UPDATE_INPUT', value: ''});
+        if (this.props.value !== '') {
+          store.dispatch({type: 'ADD_TODO', text: this.props.value});
+          store.dispatch({type: 'UPDATE_INPUT', value: ''});
+        }
       }
     }, React.createElement('input', {
       id: 'todo-entry',
@@ -35,9 +37,10 @@ const TodoInput = React.createClass({
 const Todo = React.createClass({
   render: function() {
     return React.createElement('li', {
-      onDoubleClick: ({target}) =>
-        store.dispatch({type: 'REMOVE_TODO', text: target.textContent})
-      }, this.props.data);
+      onDoubleClick: ({target: {id}}) =>
+        store.dispatch({type: 'REMOVE_TODO', id}),
+      id: this.props.data.id
+      }, this.props.data.text);
   }
 });
 
@@ -55,9 +58,9 @@ const Todos = React.createClass({
 const todos = (state = [], action) => {
   switch (action.type) {
     case 'ADD_TODO':
-      return [...state, action.text];
+      return [...state, {id: uuid.v4(), text: action.text}];
     case 'REMOVE_TODO':
-      var index = state.indexOf(action.text);
+      var index = state.findIndex(todo => todo.id === action.id);
       return (index !== -1) ? [...state.slice(0,index),...state.slice(index+1)] : state;
     default:
       return state;
