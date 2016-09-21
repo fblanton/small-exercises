@@ -52,11 +52,11 @@ const Todo = React.createClass({
 
 const Todos = React.createClass({
   render: function() {
-    const todos = this.props.data.map( todo =>
+    const list = this.props.data.map( todo =>
       React.createElement(Todo, {data: todo})
     );
 
-    return React.createElement('ul', null, ...todos);
+    return React.createElement('ul', null, list);
   }
 });
 
@@ -87,7 +87,7 @@ const { createStore, combineReducers } = Redux;
 const todoApp = combineReducers({ todos, todoInput })
 const store = createStore(todoApp);
 
-store.subscribe(() => TodoApp(store.getState(), 'todo-list'));
+store.subscribe(() => TodoApp(store.getState(), 'todo-app'));
 
 store.dispatch({type: 'ADD_TODO', text: 'hey'});
 store.dispatch({type: 'ADD_TODO', text: 'ho'});
