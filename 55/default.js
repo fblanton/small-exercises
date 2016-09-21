@@ -1,22 +1,55 @@
 /* eslint no-undef: 0 */
 
-//event listeners
-// document.getElementById('todo-entry').addEventListener('change',
-//  ({target}) => {
-//    store.dispatch({type: 'ADD_TODO', text: target.value});
-//    target.value = '';
-//    target.blur(); // fix issue where safari doesn't show placeholder after value = ''
-//    target.focus(); // fix issue where safari doesn't show placeholder after value = ''
-//  }
-// );
+// react implementation
+const TodoApp = (state, id) => {
+  ReactDOM.render(
+    React.createElement('div', null,
+      React.createElement(TodoInput, {value: state.todoInput}),
+      React.createElement(Todos, {data: state.todos})
+    ),
+    document.getElementById(id)
+  )
+};
 
-document.body.addEventListener('dblclick',
-  ({target}) => {
-    if (target.localName === 'li') {
-      store.dispatch({type: 'REMOVE_TODO', text: target.textContent});
-    }
+const TodoInput = React.createClass({
+  getInitialState: function() {
+    return { value: this.props.value };
+  },
+  render: function() {
+    return React.createElement('form', {
+      onSubmit: (e) => {
+        e.preventDefault();
+        store.dispatch({type: 'ADD_TODO', text: this.props.value});
+        store.dispatch({type: 'UPDATE_INPUT', value: ''});
+      }
+    }, React.createElement('input', {
+      id: 'todo-entry',
+      value: this.props.value,
+      placeholder: 'What todo?',
+      onChange: ({ target: { value } }) =>
+        store.dispatch({type: 'UPDATE_INPUT', value})
+    }));
   }
-);
+});
+
+const Todo = React.createClass({
+  render: function() {
+    return React.createElement('li', {
+      onDoubleClick: ({target}) =>
+        store.dispatch({type: 'REMOVE_TODO', text: target.textContent})
+      }, this.props.data);
+  }
+});
+
+const Todos = React.createClass({
+  render: function() {
+    const todos = this.props.data.map( todo =>
+      React.createElement(Todo, {data: todo})
+    );
+
+    return React.createElement('ul', null, ...todos);
+  }
+});
 
 // reducers
 const todos = (state = [], action) => {
@@ -31,60 +64,20 @@ const todos = (state = [], action) => {
   }
 };
 
-// react implementation
-const myApp = (state, id) => {
-  ReactDOM.render(
-    React.createElement(TodoApp, {data: state}),
-    document.getElementById(id)
-  )
+const todoInput = (state = '', action) => {
+  switch (action.type) {
+    case 'UPDATE_INPUT':
+      return action.value;
+    default:
+      return state;
+  }
 };
 
-const TodoInput = React.createClass({
-  getInitialState: function() {
-    return { value: ''};
-  },
-  handleChange: function ({ target: { value } }) {
-    this.setState({value: value});
-  },
-  render: function() {
-    return React.createElement('input', {
-      id: 'todo-entry',
-      value: this.state.value,
-      placeholder: 'What todo?',
-      onChange: this.handleChange
-    });
-  }
-});
+const { createStore, combineReducers } = Redux;
+const todoApp = combineReducers({ todos, todoInput })
+const store = createStore(todoApp);
 
-const TodoApp = React.createClass({
-  render: function() {
-    return React.createElement('div', null,
-      React.createElement(TodoInput),
-      React.createElement(Todos, {data: this.props.data})
-    );
-  }
-});
-
-const Todo = React.createClass({
-  render: function() {
-    return React.createElement('li', null, this.props.data);
-  }
-});
-
-const Todos = React.createClass({
-  render: function() {
-    const todos = this.props.data.map( todo =>
-      React.createElement(Todo, {data: todo})
-    );
-
-    return React.createElement('ul', null, ...todos);
-  }
-});
-
-const { createStore } = Redux;
-const store = createStore(todos);
-
-store.subscribe(() => myApp(store.getState(), 'todo-list'));
+store.subscribe(() => TodoApp(store.getState(), 'todo-list'));
 
 store.dispatch({type: 'ADD_TODO', text: 'hey'});
 store.dispatch({type: 'ADD_TODO', text: 'ho'});
