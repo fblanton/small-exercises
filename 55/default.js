@@ -4,33 +4,39 @@
 const TodoApp = (state, id) => {
   ReactDOM.render(
     React.createElement('div', null,
-      React.createElement(TodoInput, {value: state.todoInput}),
+      React.createElement(TodoForm, {value: state.todoInput}),
       React.createElement(Todos, {data: state.todos})
     ),
     document.getElementById(id)
   )
 };
 
-const TodoInput = React.createClass({
-  getInitialState: function() {
-    return { value: this.props.value };
+const TodoForm = React.createClass({
+  handleSubmit: function(e) {
+    e.preventDefault();
+    if (this.props.value !== '') {
+      store.dispatch({type: 'ADD_TODO', text: this.props.value});
+      store.dispatch({type: 'UPDATE_INPUT', value: ''});
+    }
   },
   render: function() {
     return React.createElement('form', {
-      onSubmit: (e) => {
-        e.preventDefault();
-        if (this.props.value !== '') {
-          store.dispatch({type: 'ADD_TODO', text: this.props.value});
-          store.dispatch({type: 'UPDATE_INPUT', value: ''});
-        }
-      }
-    }, React.createElement('input', {
+      onSubmit: this.handleSubmit
+    }, React.createElement(TodoInput, {value: this.props.value}));
+  }
+});
+
+const TodoInput = React.createClass({
+  handleChange: function({ target: { value } }) {
+    store.dispatch({type: 'UPDATE_INPUT', value})
+  },
+  render: function() {
+    return React.createElement('input', {
       id: 'todo-entry',
       value: this.props.value,
       placeholder: 'What todo?',
-      onChange: ({ target: { value } }) =>
-        store.dispatch({type: 'UPDATE_INPUT', value})
-    }));
+      onChange: this.handleChange
+    });
   }
 });
 
@@ -61,7 +67,8 @@ const todos = (state = [], action) => {
       return [...state, {id: uuid.v4(), text: action.text}];
     case 'REMOVE_TODO':
       var index = state.findIndex(todo => todo.id === action.id);
-      return (index !== -1) ? [...state.slice(0,index),...state.slice(index+1)] : state;
+      return (index !== -1)
+        ? [...state.slice(0,index),...state.slice(index+1)] : state;
     default:
       return state;
   }
