@@ -40,11 +40,13 @@ const TodoInput = React.createClass({
   }
 });
 
+const removeTodo = (id) => ({type: 'REMOVE_TODO', id});
+const boundRemoveTodo = ({target: {id}}) => store.dispatch(removeTodo(id));
+
 const Todo = React.createClass({
   render: function() {
     return React.createElement('li', {
-      onDoubleClick: ({target: {id}}) =>
-        store.dispatch({type: 'REMOVE_TODO', id}),
+      onDoubleClick: this.props.callback,
       id: this.props.data.id
       }, this.props.data.text);
   }
@@ -53,7 +55,7 @@ const Todo = React.createClass({
 const Todos = React.createClass({
   render: function() {
     const list = this.props.data.map( todo =>
-      React.createElement(Todo, {data: todo})
+      React.createElement(Todo, {data: todo, callback: boundRemoveTodo})
     );
 
     return React.createElement('ul', null, list);
