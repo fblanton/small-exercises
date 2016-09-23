@@ -87,7 +87,8 @@ const todoInput = (state = '', action) => {
 
 const { createStore, combineReducers } = Redux;
 const todoApp = combineReducers({ todos, todoInput })
-const store = createStore(todoApp);
+//const store = createStore(todoApp);
+let store = createStore(todoApp, window.devToolsExtension && window.devToolsExtension());
 
 store.subscribe(() => TodoApp(store.getState(), 'todo-app'));
 
