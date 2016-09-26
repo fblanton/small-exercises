@@ -2,18 +2,35 @@ img {
   width: 100%;
 }
 
-@media (min-width: 768px) {
-  .col-sm-v-center {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-  }
+a:hover {
+  text-decoration: none;
 }
 
-.col-sm-6 + .col-sm-6 {
-  float: right;
+.jumbotron {
+  background-color: rgb(255,255,255);
+}
+
+section:nth-of-type(odd) > .jumbotron {
+  background-color: rgb(245,245,241);
 }
 
 .relative {
   position: relative;
+}
+
+@media (min-width: 768px) {
+  section:nth-of-type(odd) > .jumbotron .col-sm-6:nth-of-type(odd) {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  section:nth-of-type(odd) > .jumbotron .col-sm-6:nth-of-type(even) {
+    float: right;
+  }
+  section:nth-of-type(even) > .jumbotron .col-sm-6:nth-of-type(odd) {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);;
+  }
 }
