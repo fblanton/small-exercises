@@ -5,15 +5,13 @@ ul {
 
 li {
   width: 100%;
+  margin: 10px auto;
   padding-left: 1em;
   font-size: 5em;
   font-family: sans-serif;
-  background-color: rgba(200,200,150,.5);
-  /*text-align: center;*/
-}
-
-li:nth-of-type(even) {
-  background-color: rgba(200,200,150,.3);
+  background-color: rgba(241,245,241,.5);
+  border-radius: 3px;
+  transition: all .5s;
 }
 
 li:hover {
@@ -35,5 +33,6 @@ input {
 }
 
 .completed {
+  background-color: rgba(200,255,200,.7);
   text-decoration: line-through;
 }
