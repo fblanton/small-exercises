@@ -40,14 +40,19 @@ const TodoInput = React.createClass({
   }
 });
 
-const removeTodo = (id) => ({type: 'REMOVE_TODO', id});
+const removeTodo = (id) => ({ type: 'REMOVE_TODO', id });
 const boundRemoveTodo = ({target: {id}}) => store.dispatch(removeTodo(id));
+
+const toggleTodo = (id) => ({ type: 'TOGGLE_TODO', id });
+const boundToggleTodo = ({target: {id}}) => store.dispatch(toggleTodo(id));
 
 const Todo = React.createClass({
   render: function() {
     return React.createElement('li', {
-      onDoubleClick: this.props.callback,
-      id: this.props.data.id
+      onDoubleClick: this.props.handleDoubleClick,
+      onClick: this.props.handleClick,
+      id: this.props.data.id,
+      className: (this.props.data.completed) ? 'completed' : ''
       }, this.props.data.text);
   }
 });
@@ -55,7 +60,11 @@ const Todo = React.createClass({
 const Todos = React.createClass({
   render: function() {
     const list = this.props.data.map( todo =>
-      React.createElement(Todo, {data: todo, callback: boundRemoveTodo})
+      React.createElement(Todo, {
+        data: todo,
+        handleDoubleClick: boundRemoveTodo,
+        handleClick: boundToggleTodo
+      })
     );
 
     return React.createElement('ul', null, list);
@@ -66,11 +75,21 @@ const Todos = React.createClass({
 const todos = (state = [], action) => {
   switch (action.type) {
     case 'ADD_TODO':
-      return [...state, {id: uuid.v4(), text: action.text}];
+      return [...state, {id: uuid.v4(), text: action.text, completed: false}];
     case 'REMOVE_TODO':
       var index = state.findIndex(todo => todo.id === action.id);
       return (index !== -1)
-        ? [...state.slice(0,index),...state.slice(index+1)] : state;
+        ? [...state.slice(0,index),...state.slice(index+1)]
+        : state;
+    case 'TOGGLE_TODO':
+      var index = state.findIndex(todo => todo.id === action.id);
+      return (index !== -1)
+        ? state.map(
+          todo => (todo.id === action.id)
+            ? Object.assign({}, todo, { completed: !todo.completed })
+            : todo
+          )
+        : state;
     default:
       return state;
   }
