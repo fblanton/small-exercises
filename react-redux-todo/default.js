@@ -48,11 +48,18 @@ const boundToggleTodo = ({target: {id}}) => store.dispatch(toggleTodo(id));
 
 const Todo = React.createClass({
   render: function() {
+    let classList = [];
+
+    if (this.props.data.completed) { classList.push('completed'); }
+    if (this.props.data.new) { classList.push('new'); }
+
+    classList= classList.reduce((current, next) => current + ' ' + next);
+
     return React.createElement('li', {
       onDoubleClick: this.props.handleDoubleClick,
       onClick: this.props.handleClick,
       id: this.props.data.id,
-      className: (this.props.data.completed) ? 'completed' : ''
+      className: classList
       }, this.props.data.text);
   }
 });
@@ -75,7 +82,7 @@ const Todos = React.createClass({
 const todos = (state = [], action) => {
   switch (action.type) {
     case 'ADD_TODO':
-      return [...state, {id: uuid.v4(), text: action.text, completed: false}];
+      return [...state, {id: uuid.v4(), text: action.text, completed: false, new: true}];
     case 'REMOVE_TODO':
       var index = state.findIndex(todo => todo.id === action.id);
       return (index !== -1)
@@ -87,6 +94,15 @@ const todos = (state = [], action) => {
         ? state.map(
           todo => (todo.id === action.id)
             ? Object.assign({}, todo, { completed: !todo.completed })
+            : todo
+          )
+        : state;
+    case 'TOGGLE_NEWNESS':
+      var index = state.findIndex(todo => todo.id === action.id);
+      return (index !== -1)
+        ? state.map(
+          todo => (todo.id === action.id)
+            ? Object.assign({}, todo, { new: !todo.new })
             : todo
           )
         : state;
