@@ -1,0 +1,19 @@
+img {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .col-sm-v-center {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.col-sm-6 + .col-sm-6 {
+  float: right;
+}
+
+.relative {
+  position: relative;
+}
